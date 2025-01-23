@@ -11,6 +11,7 @@
 #install.packages("sf")
 
 
+
 require(data.table)
 require(tidycensus)
 require(ggplot2)
@@ -18,11 +19,11 @@ require(ggpubr)
 require(sf)
 census_api_key("aa512886c5449a582d837da8d3a07af66a043fe5")
 
-census_data <- load_variables(2010, "sf1", cache=T)
+census_data = load_variables(2010, "sf1", cache=T)
 View(census_data)
 fwrite(census_data, "census_variables.csv")
 
-vars <- c(tpop = 'P001001',
+vars = c(tpop = 'P001001',
           medage = 'P013001',
           wpop = 'P003002',
           bpop = 'P003003',
@@ -30,7 +31,7 @@ vars <- c(tpop = 'P001001',
           hpop = 'P004003')
 View(vars)
 
-NY_df <- get_decennial(state = "ny", 
+NY_df = get_decennial(state = "ny", 
                        geography = "county",
                        variables = vars,
                        year = 2010,
@@ -42,15 +43,15 @@ plot(NY_df["tpop"])
 plot(NY_df["bpop"])
 plot(NY_df["medage"])
 
-NY_df$wpct <- (NY_df$wpop / NY_df$tpop) *100
-NY_df$bpct <- (NY_df$bpop / NY_df$tpop) *100
-NY_df$apct <- (NY_df$apop / NY_df$tpop) *100
-NY_df$hpct <- (NY_df$hpop / NY_df$tpop) *100
+NY_df$wpct = (NY_df$wpop / NY_df$tpop) *100
+NY_df$bpct = (NY_df$bpop / NY_df$tpop) *100
+NY_df$apct = (NY_df$apop / NY_df$tpop) *100
+NY_df$hpct = (NY_df$hpop / NY_df$tpop) *100
 
 ###Compute Simpson's Diversity Index **D = ((SUM n(n-1))/N(N-1))**
 ###Higher value indicates higher diversity
 
-NY_df$race_div <- 1 - (((NY_df$wpop*(NY_df$wpop-1))+
+NY_df$race_div = 1 - (((NY_df$wpop*(NY_df$wpop-1))+
                           (NY_df$bpop*(NY_df$bpop-1))+
                           (NY_df$hpop*(NY_df$hpop-1))+
                           (NY_df$apop*(NY_df$apop-1)))/
@@ -60,30 +61,30 @@ head(NY_df)
 summary(NY_df$race_div)
 plot(NY_df["race_div"])
 
-rwj <- fread("rwj_rank.csv", 
+rwj = fread("rwj_rank.csv", 
              stringsAsFactors = F, 
              data.table = F, 
              colClasses=list(character=c("FIPS")))
 head(rwj)
-ny_rwj <- subset(rwj, State == "New York")
+ny_rwj = subset(rwj, State == "New York")
 head(ny_rwj, n=62)
 
-ny_rwj_df <- merge(NY_df, 
+ny_rwj_df = merge(NY_df, 
                    ny_rwj,
                    by.x = "GEOID",
                    by.y = "FIPS")
 
 summary(ny_rwj_df)
 summary(ny_rwj_df$QL.Rank)
-ny_rwj_df$QL.Rank <- as.numeric(ny_rwj_df$QL.Rank)
+ny_rwj_df$QL.Rank = as.numeric(ny_rwj_df$QL.Rank)
 summary(ny_rwj_df$QL.Rank)
 
 ### use ggplot to visualize data in map
-map1 <- ggplot(ny_rwj_df) +
+map1 = ggplot(ny_rwj_df) +
   geom_sf(aes(fill = cut_number(QL.Rank, 5)))
 map1
 
-map2 <- ggplot(ny_rwj_df, aes(fill = QL.Rank)) +
+map2 = ggplot(ny_rwj_df, aes(fill = QL.Rank)) +
   geom_sf() +
   #scale_fill_continuous(low = "#34E8EB", high = "#3D34EB") +
   scale_fill_continuous(low = "lightgreen", high = "darkgreen") +
@@ -95,18 +96,18 @@ map2 <- ggplot(ny_rwj_df, aes(fill = QL.Rank)) +
 map2
 
 summary(ny_rwj_df$QL.Rank)
-ny_rwj_df$QL.Rank <- (ny_rwj_df$QL.Rank - 63) * -1
+ny_rwj_df$QL.Rank = (ny_rwj_df$QL.Rank - 63) * -1
 
-map3 <- ggplot(ny_rwj_df) +
+map3 = ggplot(ny_rwj_df) +
   geom_sf(aes(fill=QL.Rank)) +
   scale_fill_continuous(low = "lightgreen", high = "darkgreen") +
   ggtitle("County Level Quality of Life Rank") +
   theme(axis.text=element_text(size=8),                       
         axis.title=element_text(size=8,face="bold"),
-        plot.title = element_text(hjust = 0.5))  
+        plot.title = element_text(hjust = 0.5))
 map3
 
-map4 <- ggplot(ny_rwj_df) +
+map4 = ggplot(ny_rwj_df) +
   geom_sf(aes(fill=QL.Rank)) +
   scale_fill_continuous(low = "lightgreen", high = "darkgreen") +
   ggtitle("County Level Quality of Life Rank") +
@@ -115,7 +116,7 @@ map4 <- ggplot(ny_rwj_df) +
         plot.title = element_text(face="bold",size=12,hjust = 0.5)) 
 map4
 
-map5 <- ggplot(ny_rwj_df) +
+map5 = ggplot(ny_rwj_df) +
   geom_sf(aes(fill=QL.Rank)) +
   scale_fill_continuous(low = "lightgreen", high = "darkgreen") +
   ggtitle("County Level Quality of Life Rank") +
@@ -128,7 +129,7 @@ map5 <- ggplot(ny_rwj_df) +
         legend.position = c(0.9,0.5)) 
 map5
 
-map6 <- ggplot(ny_rwj_df) +
+map6 = ggplot(ny_rwj_df) +
   geom_sf(aes(fill=QL.Rank)) +
   scale_fill_continuous(low = "lightgreen", high = "darkgreen",
                         breaks = c(12, 24, 36, 48, 60),
@@ -148,7 +149,7 @@ map6 <- ggplot(ny_rwj_df) +
         legend.position = c(0.9,0.5)) 
 map6
 
-map7 <- ggplot(ny_rwj_df) +
+map7 = ggplot(ny_rwj_df) +
   geom_sf(aes(fill=QL.Rank)) +
   scale_fill_continuous(low = "lightgreen", high = "darkgreen",
                         breaks = c(3, 12, 24, 36, 48, 60),
@@ -174,7 +175,7 @@ map7
 names(ny_rwj_df)
 summary(ny_rwj_df$race_div)
 
-map8 <- ggplot(ny_rwj_df) +
+map8 = ggplot(ny_rwj_df) +
   geom_sf(aes(fill = race_div)) +
   scale_fill_continuous(low = "lightgreen", high = "darkgreen",
                         breaks = c(0.05, 0.1, 0.16, 0.31, 0.65),
@@ -197,14 +198,14 @@ map8 <- ggplot(ny_rwj_df) +
 map8
 
 
-ny_rwj_df$race_div_bin <- ifelse(ny_rwj_df$race_div > mean(ny_rwj_df$race_div),
+ny_rwj_df$race_div_bin = ifelse(ny_rwj_df$race_div > mean(ny_rwj_df$race_div),
                                  "High Diversity",
                                  "Low Diversity")
-ny_rwj_df$Qual_Life_bin <- ifelse(ny_rwj_df$QL.Rank > mean(ny_rwj_df$QL.Rank),
+ny_rwj_df$Qual_Life_bin = ifelse(ny_rwj_df$QL.Rank > mean(ny_rwj_df$QL.Rank),
                                   "High Quality of Life",
                                   "Low Quality of Life")
 
-plot1 <- ggplot(ny_rwj_df, 
+plot1 = ggplot(ny_rwj_df, 
                      aes(x = race_div_bin, 
                          y = QL.Rank, 
                          group = race_div_bin, 
@@ -222,7 +223,7 @@ plot1
 #require(RColorBrewer)
 #display.brewer.all()
 
-plot2 <- ggplot(ny_rwj_df, 
+plot2 = ggplot(ny_rwj_df, 
                 aes(x = Qual_Life_bin, 
                     y = race_div, 
                     group = Qual_Life_bin, 
@@ -240,7 +241,7 @@ plot2
 #install.packages("ggpubr")
 require(ggpubr)
 
-full_plot <- ggarrange(map7,
+full_plot = ggarrange(map7,
                        map8,
                        plot1,
                        plot2,
